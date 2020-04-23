@@ -206,9 +206,9 @@ Walk through the Queue class in the curriculum and understand it well. Then writ
 
 ```js
 class Node {
-  constructor(value, ptr) {
+  constructor(value) {
     this.value = value;
-    this.next = ptr;
+    this.next = null;
   }
 }
 
@@ -244,12 +244,95 @@ Implement a peek() function outside of the Queue class that lets you take a peek
 Implement a isEmpty() function outside the Queue class that allows you to check if the queue is empty or not
 Implement a display() function outside of the Queue class that lets you display what's in the queue.
 Remove Spock from the queue and display the resulting queue.
+
+```js
+const starTrekQ = new Queue;
+
+starTrekQ.enqueue('Kirk')
+starTrekQ.enqueue('Spock')
+starTrekQ.enqueue('Uhura')
+starTrekQ.enqueue('Sulu')
+starTrekQ.enqueue('Checkov')
+
+function peek(queue) {
+  return queue.first.value;
+}
+
+function isEmpty(queue) {
+  if (queue.first === null) {
+    return true;
+  }
+  return false;
+}
+
+function display(queue) {
+  let currentNode = queue.first;
+  while (currentNode !== null) {
+    console.log(currentNode.value);
+    currentNode = currentNode.next;
+  }
+}
+
+starTrekQ.dequeue()
+starTrekQ.dequeue()
+display(starTrekQ)
+// Uhura
+// Sulu
+// Checkov
+```
+
 ## 7. Create a queue class using Doubly linked List
+
+```js
+class Node {
+  constructor(value, prev) {
+    this.value = value;
+    this.prev = prev;
+    this.next = null;
+  }
+}
+
+class Queue {
+  constructor() {
+    this.first = null;
+    this.last = null;
+  }
+
+  enqueue(value) {
+    const node = new Node(value, this.last);
+    if (this.last) {
+      this.last.next = node;
+    }
+    if (this.first === null) {
+      this.first = node;
+    }
+    this.last = node;
+  }
+
+  dequeue() {
+    if (this.first === null) {return 'The queue is empty'}
+    const result = this.first.value;
+    this.first = this.first.next || null;
+    this.first.prev = null;
+
+    return result;
+  }
+}
+```
+
 Use the items listed in #6 and enqueue them to your queue.
 
+> I'm not sure I understand the point being illustrated here. The queue will look the same, regardless of it being a doubly linked list.
+
 Check to see who is first one on the Queue?
+
 ## 8. Queue implementation using a stack
 There are many ways to implement a queue. You have learned using singly linked list, and doubly linked list. Keeping the concept of a queue in mind, implement a queue using 2 stacks and no other data structure. (You are not allowed to use a doubly linked list or array. Use your stack implementation with a linked list from above to solve this problem.)
+
+```js
+// Push things onto one stack when you enqueue
+// When you dequeue, pop things off the first stack and push them onto the second stack to reverse the order
+```
 
 ## 9. Square dance pairing
 As people come to the dance floor, they should be paired off as quickly as possible: man with woman, man with woman, all the way down the line. If several men arrive in a row, they should be paired in the order they came, and likewise if several women do. Maintain a queue of "spares" (men for whom you have no women yet, or vice versa), and pair them as appropriate.
@@ -274,6 +357,78 @@ Female dancer is Jane, and the male dancer is Frank
 Female dancer is Madonna, and the male dancer is John
 Female dancer is Beyonce, and the male dancer is Sherlock
 There are 2 male dancers waiting to dance
+
+```js
+// Make two queues, one male one female
+// When a new dancer arrives, check if there is someone available in the male/female queue for them
+// If there is, return both dancers as a pair
+// If not, add the new dancer to the queue
+
+const dancePairing = (function() {
+    const males = new Queue;
+    const females = new Queue;
+    let malesLength = 0;
+    let femalesLength = 0;
+
+    return function(dancer) {
+        if (dancer.gender === 'm') {
+            if (females.peek()) {
+                const partner = females.dequeue();
+                console.log(`Female dancer is ${partner} and male dancer is ${dancer.name}`);
+                femalesLength--;
+            }
+            else {
+               males.enqueue(dancer.name)
+               malesLength++;
+            }
+        }
+        else if (dancer.gender === 'f') {
+            if (males.peek()) {
+                const partner = males.dequeue();
+                console.log(`Female dancer is ${dancer.name}, and the male dancer is ${partner}`)
+                malesLength--;
+            }
+            else {
+                females.enqueue(dancer.name)
+                femalesLength++;
+            }
+        }
+    }
+})()
+
+dancePairing({
+    gender: 'f',
+    name: 'Jane'
+})
+dancePairing({
+    gender: 'm',
+    name: 'Frank'
+})
+dancePairing({
+    gender: 'm',
+    name: 'John'
+})
+dancePairing({
+    gender: 'm',
+    name: 'Sherlock'
+})
+dancePairing({
+    gender: 'f',
+    name: 'Madonna'
+})
+dancePairing({
+    gender: 'm',
+    name: 'David'
+})
+dancePairing({
+    gender: 'm',
+    name: 'Christopher'
+})
+dancePairing({
+    gender: 'f',
+    name: 'Beyonce'
+})
+```
 
 ## 10. The Ophidian Bank
 At the Ophidian Bank, a single teller serves a long queue of people. New customers join the end of the queue, and the teller will serve a customer only if they have all of the appropriate paperwork. Write a representation of this queue; 25% of the time (random), a customer's paperwork isn't quite right, and it's back to the end of the queue. Show what a few minutes of the bank's lobby would look like.
